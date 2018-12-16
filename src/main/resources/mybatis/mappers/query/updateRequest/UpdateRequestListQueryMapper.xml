@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhraseArt.infrastructure.query.UpdateRequest.UpdateRequestListQuery.UpdateRequestQueryMapper">
+    <!--かなりJOIN数も多くて、負荷が高そうなので、運用していって問題あるようなら別の手段を取るようにする。(JOIN等で利用するカラムにIndexは貼っている。)-->
+    <sql id="selectBase">
+        SELECT
+            UR.id                                 AS update_request_id,
+            UR.user_id                            AS user_id,
+            UR.type                               AS type,
+            UR.finished                           AS finished,
+            UR.decision_expires_at                AS decision_expires_at,
+            UR.final_decision_result              AS final_decision_result,
+            PR.requested_category_id              AS pr_requested_category_id,
+            PR.requested_subcategory_id           AS pr_requested_subcategory_id,
+            PR.requested_subcategory_name         AS pr_requested_subcategory_name,
+            PR.requested_phrase_content           AS pr_requested_phrase_content,
+            PR.requested_phrase_author_name       AS pr_requested_phrase_author_name,
+            PR_C.name                             AS prc_category_name,
+            PM.requested_subcategory_id           AS pm_requested_subcategory_id,
+            PM.requested_subcategory_name         AS pm_requested_subcategory_name,
+            PM.requested_phrase_content           AS pm_requested_phrase_content,
+            PM.requested_phrase_author_name       AS pm_requested_phrase_author_name,
+            PM_C.id                               AS pmc_category_id,
+            PM_C.name                             AS pmc_category_name,
+            PD.current_phrase_content             AS pd_phrase_content,
+            PD.current_phrase_author_name         AS pd_author_name,
+            PD_C.id                               AS pdc_category_id,
+            PD_C.name                             AS pdc_category_name,
+            PD.current_subcategory_id             AS pd_subcategory_id,
+            PD.current_subcategory_name           AS pd_subcategory_name,
+            SM.requested_subcategory_id           AS sm_requested_subcategory_id,
+            SM.requested_subcategory_name         AS sm_requested_subcategory_name,
+            SM.requested_subcategory_introduction AS sm_requested_subcategory_introduction,
+            SM_C.id                               AS smc_category_id,
+            SM_C.name                             AS smc_category_name,
+            count(CASE WHEN RD.result = 'approve' THEN 1 END) AS approved_count,
+            count(CASE WHEN RD.result = 'reject' THEN 1 END)  AS rejected_count
+        FROM
+            update_requests UR
+        <!--update_requestsに紐づく名言登録・名言修正・名言削除・サブカテゴリー修正申請のJOIN ↓-->
+        LEFT JOIN phrase_registration_requests      PR   ON UR.id = PR.update_request_id
+        LEFT JOIN phrase_modification_requests      PM   ON UR.id = PM.update_request_id
+        LEFT JOIN phrase_deletion_requests          PD   ON UR.id = PD.update_request_id
+        LEFT JOIN subcategory_modification_requests SM   ON UR.id = SM.update_request_id
+
+        <!--各申請に紐づく、表示に必要なデータのJOIN ↓-->
+        LEFT JOIN categories                        PR_C ON PR_C.id = PR.requested_category_id
+        LEFT JOIN categories                        PM_C ON PM_C.id = PM.requested_category_id
+        LEFT JOIN categories                        PD_C ON PD_C.id = PD.current_category_id
+        LEFT JOIN subcategories                     SM_S ON SM_S.id = SM.requested_subcategory_id
+        LEFT JOIN categories                        SM_C ON SM_C.id = SM_S.category_id
+
+        <!--decisions(判定)のJOIN ↓-->
+        LEFT JOIN update_request_decisions          RD   ON UR.id = RD.update_request_id
+    </sql>
+
+    <sql id="groupByBase">
+        GROUP BY
+            update_request_id,
+            user_id,
+            type,
+            finished,
+            decision_expires_at,
+            final_decision_result,
+            pr_requested_category_id,
+            pr_requested_subcategory_id,
+            pr_requested_subcategory_name,
+            pr_requested_phrase_content,
+            pr_requested_phrase_author_name,
+            prc_category_name,
+            pm_requested_subcategory_id,
+            pm_requested_subcategory_name,
+            pm_requested_phrase_content,
+            pm_requested_phrase_author_name,
+            pmc_category_id,
+            pmc_category_name,
+            pd_phrase_content,
+            pd_author_name,
+            pdc_category_id,
+            pdc_category_name,
+            pd_subcategory_id,
+            pd_subcategory_name,
+            sm_requested_subcategory_id,
+            sm_requested_subcategory_name,
+            sm_requested_subcategory_introduction,
+            smc_category_id,
+            smc_category_name
+    </sql>
+
+    <select id="selectAllRequesting" resultType="PhraseArt.infrastructure.query.UpdateRequest.UpdateRequestListQuery.UpdateRequestListItemDao">
+        <include refid="selectBase" />
+        WHERE UR.finished = 0
+        <include refid="groupByBase" />
+        ORDER BY UR.created_at DESC, UR.id
+        LIMIT  #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <select id="selectAllFinished" resultType="PhraseArt.infrastructure.query.UpdateRequest.UpdateRequestListQuery.UpdateRequestListItemDao">
+        <include refid="selectBase" />
+        WHERE UR.finished = 1
+        <include refid="groupByBase" />
+        ORDER BY UR.created_at DESC, UR.id
+        LIMIT  #{limit}
+        OFFSET #{offset}
+    </select>
+</mapper>

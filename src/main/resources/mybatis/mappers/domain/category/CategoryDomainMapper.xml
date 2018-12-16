@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhraseArt.infrastructure.domain.category.category.CategoryDomainMapper">
+    <sql id="selectBase">
+        SELECT
+            id,
+            name,
+            image_path,
+            sequence,
+            video_on_demand_associated
+        FROM
+            categories C
+    </sql>
+
+    <select id="categoryOfId" resultType="PhraseArt.infrastructure.domain.category.category.CategoryDomainDao">
+        <include refid="selectBase" />
+        WHERE C.id = #{id}
+        LIMIT 1
+    </select>
+</mapper>

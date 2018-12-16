@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhraseArt.infrastructure.domain.updateRequest.comment.UpdateRequestCommentDomainMapper">
+    <sql id="selectBase">
+        select
+            id,
+            user_id,
+            update_request_id,
+            content
+        from
+            update_request_comments
+    </sql>
+
+    <select id="selectOneById" resultType="PhraseArt.infrastructure.domain.updateRequest.comment.UpdateRequestCommentDao">
+        <include refid="selectBase" />
+        WHERE id = #{id} LIMIT 1
+    </select>
+
+    <insert id="insertComment">
+        INSERT INTO update_request_comments (id, user_id, update_request_id, content) VALUES
+        (#{id}, #{userId}, #{updateRequestId}, #{content})
+    </insert>
+
+    <update id="updateComment">
+        UPDATE update_request_comments
+        SET content = #{content}
+        WHERE id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhraseArt.infrastructure.domain.category.subcategory.SubcategoryDomainMapper">
+    <sql id="selectBase">
+        select
+            S.id                         AS subcategory_id,
+            C.id                         AS category_id,
+            C.name                       AS category_name,
+            C.image_path                 AS category_image_path,
+            C.sequence                   AS category_sequence,
+            C.video_on_demand_associated AS category_video_on_demand_associated,
+            S.name                       AS subcategory_name,
+            S.image_path                 AS subcategory_image_path,
+            S.introduction               AS subcategory_introduction
+        from
+            subcategories S
+        INNER JOIN categories C ON C.id = S.category_id
+    </sql>
+
+    <select id="selectOneById" resultType="PhraseArt.infrastructure.domain.category.subcategory.SubcategoryDomainDao">
+        <include refid="selectBase" />
+        WHERE S.id = #{id} LIMIT 1
+    </select>
+
+    <select id="selectAllByCategoryId" resultType="PhraseArt.infrastructure.domain.category.subcategory.SubcategoryDomainDao">
+        <include refid="selectBase" />
+        WHERE S.category_id = #{categoryId}
+        ORDER BY S.sequence
+    </select>
+
+    <select id="selectOneByCategoryIdAndName" resultType="PhraseArt.infrastructure.domain.category.subcategory.SubcategoryDomainDao">
+        <include refid="selectBase" />
+        WHERE S.category_id = #{categoryId}
+            AND S.name = #{name}
+        LIMIT 1
+    </select>
+
+    <insert id="insert">
+        INSERT INTO subcategories (id, category_id, name, image_path, introduction, sequence) VALUES
+            (#{id}, #{categoryId}, #{name}, #{imagePath}, #{introduction}, #{sequence})
+    </insert>
+
+    <update id="update">
+        UPDATE subcategories
+            SET category_id = #{categoryId},
+                name = #{name},
+                image_path = #{imagePath},
+                introduction = #{introduction}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 以下、VideoOnDemand関係のメソッド -->
+
+    <sql id="selectBaseForVideoOnDemand">
+        SELECT
+            V.id          AS id,
+            V.name_key    AS name_key,
+            V.name        AS name,
+            V.image_path  AS image_path,
+            V.url         AS url,
+            V.sequence    AS sequence
+        FROM
+            video_on_demands V
+    </sql>
+
+    <select id="selectAllVIdeoOnDemandsByNameKeys" resultType="PhraseArt.infrastructure.domain.category.subcategory.VideoOnDemandDomainDao">
+        <include refid="selectBaseForVideoOnDemand" />
+        WHERE name_key in
+            <foreach item="namekey" collection="namekeys"
+                     open="(" separator="," close=")">
+                #{namekey}
+            </foreach>
+        ORDER BY V.sequence
+    </select>
+
+    <select id="selectAllVideoOnDemandsBySubcategoryId" resultType="PhraseArt.infrastructure.domain.category.subcategory.VideoOnDemandDomainDao">
+        <include refid="selectBaseForVideoOnDemand" />
+        INNER JOIN subcategory_video_on_demands S ON V.id = S.video_on_demand_id
+        WHERE
+            S.subcategory_id = #{subcategoryId}
+        ORDER BY V.sequence
+    </select>
+
+    <select id="selectOneVideOnDemandByNameKey" resultType="PhraseArt.infrastructure.domain.category.subcategory.VideoOnDemandDomainDao">
+        <include refid="selectBaseForVideoOnDemand" />
+        WHERE
+            V.name_key = #{nameKey}
+        LIMIT 1
+    </select>
+
+    <insert id="insertSubcategoryVideoOnDemand">
+        INSERT INTO subcategory_video_on_demands (id, subcategory_id, video_on_demand_id) VALUES
+            (#{id}, #{subcategoryId}, #{videoOnDemandId})
+    </insert>
+
+    <delete id="deleteSubcategoryVideoOnDemand">
+        DELETE FROM subcategory_video_on_demands
+            WHERE subcategory_id = #{subcategoryId}
+    </delete>
+</mapper>

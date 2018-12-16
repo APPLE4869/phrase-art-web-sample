@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhraseArt.infrastructure.query.Phrase.PhraseCommentQuery.UpdateRequestCommentQueryMapper">
+    <sql id="selectBase">
+        SELECT
+            C.id         AS comment_id,
+            U.id         AS user_id,
+            U.username   AS username,
+            P.image_path AS user_image_path,
+            C.content    AS content,
+            C.created_at AS created_at
+        FROM update_request_comments C
+        INNER JOIN users    U ON C.user_id = U.id
+        LEFT  JOIN profiles P ON P.user_id = U.id
+    </sql>
+
+    <select id="selectAllLatestComments" resultType="PhraseArt.infrastructure.query.Phrase.PhraseCommentQuery.UpdateRequestCommentQueryDao">
+        <include refid="selectBase" />
+        WHERE C.update_request_id = #{updateRequestId}
+        ORDER BY C.created_at DESC, C.id
+    </select>
+
+    <select id="selectAllPreviousComments" resultType="PhraseArt.infrastructure.query.Phrase.PhraseCommentQuery.UpdateRequestCommentQueryDao">
+        <include refid="selectBase" />
+        <![CDATA[
+        WHERE C.update_request_id = #{updateRequestId}
+            AND
+                (
+                    SELECT
+                        created_at
+                    FROM update_request_comments
+                        WHERE id = #{latestCommentId}
+                ) >  C.created_at
+        ORDER BY C.created_at DESC, C.id
+        OFFSET #{offset}
+        LIMIT  #{limit}
+        ]]>
+    </select>
+
+    <select id="selectAllFollowingComments" resultType="PhraseArt.infrastructure.query.Phrase.PhraseCommentQuery.UpdateRequestCommentQueryDao">
+        <include refid="selectBase" />
+        <![CDATA[
+        WHERE C.update_request_id = #{updateRequestId}
+            AND
+                (
+                    SELECT
+                        created_at
+                    FROM update_request_comments
+                        WHERE id = #{latestCommentId}
+                ) <  C.created_at
+        ORDER BY C.created_at DESC, C.id
+        ]]>
+    </select>
+</mapper>

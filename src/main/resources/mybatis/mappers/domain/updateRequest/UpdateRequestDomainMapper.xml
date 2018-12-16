@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhraseArt.infrastructure.domain.updateRequest.updateRequest.UpdateRequestDomainMapper">
+    <!-- ここから Select 用XML -->
+
+    <sql id="selectBase">
+        SELECT
+            <!--ここから update_requests のカラム-->
+            UR.id                                 AS update_request_id,
+            UR.user_id                            AS user_id,
+            UR.type                               AS type,
+            UR.finished                           AS finished,
+            UR.decision_expires_at                AS decision_expires_at,
+            UR.final_decision_result              AS final_decision_result,
+
+            <!--ここから phrase_registration_requests のカラム-->
+            PR.requested_category_id              AS pr_requested_category_id,
+            PR.requested_subcategory_id           AS pr_requested_subcategory_id,
+            PR.requested_subcategory_name         AS pr_requested_subcategory_name,
+            PR.requested_phrase_content           AS pr_requested_phrase_content,
+            PR.requested_phrase_author_name       AS pr_requested_phrase_author_name,
+
+            <!--ここから phrase_modification_requests のカラム-->
+            PM.requested_phrase_id                AS pm_requested_phrase_id,
+            PM.requested_category_id              AS pm_requested_category_id,
+            PM.requested_subcategory_id           AS pm_requested_subcategory_id,
+            PM.requested_subcategory_name         AS pm_requested_subcategory_name,
+            PM.requested_phrase_content           AS pm_requested_phrase_content,
+            PM.requested_phrase_author_name       AS pm_requested_phrase_author_name,
+            PM.current_category_id                AS pm_current_category_id,
+            PM.current_subcategory_id             AS pm_current_subcategory_id,
+            PM.current_subcategory_name           AS pm_current_subcategory_name,
+            PM.current_phrase_content             AS pm_current_phrase_content,
+            PM.current_phrase_author_name         AS pm_current_phrase_author_name,
+
+            <!--ここから phrase_deletion_requests のカラム-->
+            PD.requested_phrase_id                AS pd_requested_phrase_id,
+            PD.current_category_id                AS pd_current_category_id,
+            PD.current_subcategory_id             AS pd_current_subcategory_id,
+            PD.current_subcategory_name           AS pd_current_subcategory_name,
+            PD.current_phrase_content             AS pd_current_phrase_content,
+            PD.current_phrase_author_name         AS pd_current_phrase_author_name,
+
+            <!--ここから subcategory_modification_requests のカラム-->
+            SM.requested_subcategory_id           AS sm_requested_subcategory_id,
+            SM.requested_subcategory_name         AS sm_requested_subcategory_name,
+            SM.requested_subcategory_introduction AS sm_requested_subcategory_introduction,
+            SM.requested_subcategory_image_path   AS sm_requested_subcategory_image_path,
+            SM.current_category_id                AS sm_current_category_id,
+            SM.current_subcategory_name           AS sm_current_subcategory_name,
+            SM.current_subcategory_introduction   AS sm_current_subcategory_introduction,
+            SM.current_subcategory_image_path     AS sm_current_subcategory_image_path
+        FROM
+            update_requests UR
+        LEFT JOIN phrase_registration_requests      PR ON UR.id = PR.update_request_id
+        LEFT JOIN phrase_modification_requests      PM ON UR.id = PM.update_request_id
+        LEFT JOIN phrase_deletion_requests          PD ON UR.id = PD.update_request_id
+        LEFT JOIN subcategory_modification_requests SM ON UR.id = SM.update_request_id
+    </sql>
+
+    <select
+        id="selectOneById"
+        resultType="PhraseArt.infrastructure.domain.updateRequest.updateRequest.UpdateRequestDao">
+        <include refid="selectBase" />
+        WHERE UR.id = #{updateRequestId}
+        LIMIT 1
+    </select>
+
+    <select
+        id="selectOneUnfinishedPhraseRegistrationRequestByPhraseColumns"
+        resultType="PhraseArt.infrastructure.domain.updateRequest.updateRequest.UpdateRequestDao">
+        <include refid="selectBase" />
+        WHERE   PR.requested_category_id        = #{requestedCategoryId}
+            AND PR.requested_subcategory_name   = #{requestedSubcategoryName}
+            AND PR.requested_phrase_content     = #{requestedPhraseContent}
+            AND PR.requested_phrase_author_name = #{requestedAuthorName}
+            AND UR.finished                     = 0
+        LIMIT 1
+    </select>
+
+    <select
+        id="selectOneUnfinishedPhraseModificationRequestByPhraseColumns"
+        resultType="PhraseArt.infrastructure.domain.updateRequest.updateRequest.UpdateRequestDao">
+        <include refid="selectBase" />
+        WHERE   PM.requested_category_id        = #{requestedCategoryId}
+            AND PM.requested_subcategory_name   = #{requestedSubcategoryName}
+            AND PM.requested_phrase_content     = #{requestedPhraseContent}
+            AND PM.requested_phrase_author_name = #{requestedAuthorName}
+            AND UR.finished                     = 0
+        LIMIT 1
+    </select>
+
+    <select
+            id="selectOneUnfinishedModificationRequestByPhraseId"
+            resultType="PhraseArt.infrastructure.domain.updateRequest.updateRequest.UpdateRequestDao">
+        <include refid="selectBase" />
+        WHERE   PM.requested_phrase_id = #{phraseId}
+            AND UR.finished            = 0
+        LIMIT 1
+    </select>
+
+    <select
+            id="selectOneUnfinishedDeletionRequestByPhraseId"
+            resultType="PhraseArt.infrastructure.domain.updateRequest.updateRequest.UpdateRequestDao">
+        <include refid="selectBase" />
+        WHERE   PD.requested_phrase_id = #{phraseId}
+            AND UR.finished            = 0
+        LIMIT 1
+    </select>
+
+    <select
+        id="selectAllWhereUnfinishedAndExpired"
+        resultType="PhraseArt.infrastructure.domain.updateRequest.updateRequest.UpdateRequestDao">
+        <include refid="selectBase" />
+        <![CDATA[
+        WHERE   UR.finished = 0
+            AND decision_expires_at < #{now}
+        ]]>
+    </select>
+
+    <!-- ここまで Select 用XML -->
+
+
+
+    <!-- ここから Update 用XML -->
+
+    <insert id="updateRequestById">
+        UPDATE update_requests
+        SET finished = #{finished},
+            final_decision_result = #{finalDecisionResult}
+        WHERE id = #{id}
+    </insert>
+
+    <!-- ここまで Update 用XML -->
+
+
+
+    <!-- ここから Insert 用XML -->
+
+    <insert id="insertRequest">
+        INSERT INTO
+            update_requests(id, user_id, type, finished, decision_expires_at, final_decision_result)
+        VALUES
+            (#{id}, #{userId}, #{type}, #{finished}, #{decisionExpiresAt}, #{finalDecisionResult})
+    </insert>
+
+    <insert id="insertPhraseRegistrationRequest">
+        INSERT INTO
+            phrase_registration_requests(
+                id,
+                update_request_id,
+                requested_category_id,
+                requested_subcategory_id,
+                requested_subcategory_name,
+                requested_phrase_content,
+                requested_phrase_author_name
+            )
+        VALUES
+            (
+                #{id},
+                #{updateRequestId},
+                #{requestedCategoryId},
+                #{requestedSubcategoryId},
+                #{requestedSubcategoryName},
+                #{requestedPhraseContent},
+                #{requestedPhraseAuthorName}
+            )
+    </insert>
+
+    <insert id="insertPhraseModificationRequest">
+        INSERT INTO
+            phrase_modification_requests(
+                id,
+                update_request_id,
+                requested_phrase_id,
+                requested_category_id,
+                requested_subcategory_id,
+                requested_subcategory_name,
+                requested_phrase_content,
+                requested_phrase_author_name,
+                current_category_id,
+                current_subcategory_id,
+                current_subcategory_name,
+                current_phrase_content,
+                current_phrase_author_name
+            )
+        VALUES
+            (
+                #{id},
+                #{updateRequestId},
+                #{requestedPhraseId},
+                #{requestedCategoryId},
+                #{requestedSubcategoryId},
+                #{requestedSubcategoryName},
+                #{requestedPhraseContent},
+                #{requestedPhraseAuthorName},
+                #{currentCategoryId},
+                #{currentSubcategoryId},
+                #{currentSubcategoryName},
+                #{currentPhraseContent},
+                #{currentPhraseAuthorName}
+            )
+    </insert>
+
+    <insert id="insertPhraseDeletionRequest">
+        INSERT INTO
+            phrase_deletion_requests(
+                id,
+                update_request_id,
+                requested_phrase_id,
+                current_category_id,
+                current_subcategory_id,
+                current_subcategory_name,
+                current_phrase_content,
+                current_phrase_author_name
+            )
+        VALUES
+            (
+                #{id},
+                #{updateRequestId},
+                #{requestedPhraseId},
+                #{currentCategoryId},
+                #{currentSubcategoryId},
+                #{currentSubcategoryName},
+                #{currentPhraseContent},
+                #{currentPhraseAuthorName}
+            )
+    </insert>
+
+    <insert id="insertSubcategoryModificationRequest">
+        INSERT INTO
+            subcategory_modification_requests(
+                id,
+                update_request_id,
+                requested_subcategory_id,
+                requested_subcategory_name,
+                requested_subcategory_introduction,
+                requested_subcategory_image_path,
+                current_category_id,
+                current_subcategory_name,
+                current_subcategory_introduction,
+                current_subcategory_image_path
+            )
+        VALUES
+            (
+                #{id},
+                #{updateRequestId},
+                #{requestedSubcategoryId},
+                #{requestedSubcategoryName},
+                #{requestedSubcategoryIntroduction},
+                #{requestedSubcategoryImagePath},
+                #{currentCategoryId},
+                #{currentSubcategoryName},
+                #{currentSubcategoryIntroduction},
+                #{currentSubcategoryImagePath}
+            )
+    </insert>
+
+    <!-- ここまで Insert 用XML -->
+</mapper>

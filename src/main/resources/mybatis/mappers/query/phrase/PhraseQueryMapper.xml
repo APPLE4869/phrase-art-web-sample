@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhraseArt.infrastructure.query.Phrase.PhraseQuery.PhraseQueryMapper">
+    <sql id="selectBase">
+        SELECT
+            P.id           AS phrase_id,
+            C.id           AS category_id,
+            C.name         AS category_name,
+            C.sequence     AS category_sequence,
+            S.id           AS subcategory_id,
+            S.name         AS subcategory_name,
+            S.image_path   AS subcategory_image_path,
+            S.introduction AS subcategory_introduction,
+            S.sequence     AS subcategory_sequence,
+            P.content      AS phrase_content,
+            P.author_name  AS author_name,
+            count(L.id)    AS like_count,
+            count(F.id)    AS favorite_count,
+            count(CM.id)   AS comment_count,
+            CASE WHEN LU.id IS NOT NULL THEN 1 ELSE 0 END AS current_user_liked,
+            CASE WHEN FU.id IS NOT NULL THEN 1 ELSE 0 END AS current_user_favorited
+        FROM phrases P
+        INNER JOIN categories        C  ON P.category_id    = C.id
+        LEFT JOIN  subcategories     S  ON P.subcategory_id = S.id
+        LEFT JOIN  phrase_likes      L  ON P.id             = L.phrase_id
+        LEFT JOIN  phrase_favorites  F  ON P.id             = F.phrase_id
+        LEFT JOIN  phrase_comments   CM ON P.id             = CM.phrase_id
+        LEFT JOIN  phrase_likes      LU ON P.id             = LU.phrase_id AND LU.user_id = #{userId}
+        LEFT JOIN  phrase_favorites  FU ON P.id             = FU.phrase_id AND FU.user_id = #{userId}
+    </sql>
+
+    <sql id="groupByBase">
+        GROUP BY
+            phrase_id,
+            category_id,
+            category_name,
+            category_sequence,
+            subcategory_id,
+            subcategory_name,
+            subcategory_image_path,
+            subcategory_introduction,
+            subcategory_sequence,
+            phrase_content,
+            author_name,
+            current_user_liked,
+            current_user_favorited
+    </sql>
+
+    <select id="selectAll" resultType="PhraseArt.infrastructure.query.Phrase.PhraseQuery.PhraseDao">
+        <include refid="selectBase" />
+        <include refid="groupByBase" />
+        ORDER  BY P.created_at DESC, P.id
+        LIMIT  #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <select id="selectAllByCategoryId" resultType="PhraseArt.infrastructure.query.Phrase.PhraseQuery.PhraseDao">
+        <include refid="selectBase" />
+        WHERE  C.id = #{categoryId}
+        <include refid="groupByBase" />
+        ORDER  BY P.created_at DESC, P.id
+        LIMIT  #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <select id="selectAllBySubcategoryId" resultType="PhraseArt.infrastructure.query.Phrase.PhraseQuery.PhraseDao">
+        <include refid="selectBase" />
+        WHERE  S.id = #{subcategoryId}
+        <include refid="groupByBase" />
+        ORDER  BY P.created_at DESC, P.id
+        LIMIT  #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <select id="selectOneById" resultType="PhraseArt.infrastructure.query.Phrase.PhraseQuery.PhraseDao">
+        <include refid="selectBase" />
+        WHERE P.id = #{id}
+        <include refid="groupByBase" />
+        LIMIT 1
+    </select>
+</mapper>

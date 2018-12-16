@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhraseArt.infrastructure.query.UpdateRequest.UpdateRequestDetailQuery.UpdateRequestDetailQueryMapper">
+    <!--登録申請・修正申請・削除申請それぞれで表示したい内容を細かく変える可能性が高いので、それぞれのSQLは共通化していない。-->
+    <select id="selectOnePhraseRegistrationReqeustById" resultType="PhraseArt.infrastructure.query.UpdateRequest.UpdateRequestDetailQuery.PhraseRegistrationRequestDao">
+        SELECT
+            UR.id                           AS update_request_id,
+            UR.finished                     AS finished,
+            UR.decision_expires_at          AS decision_expires_at,
+            UR.final_decision_result        AS final_decision_result,
+            C.id                            AS category_id,
+            C.name                          AS category_name,
+            PR.requested_subcategory_id     AS subcategory_id,
+            PR.requested_subcategory_name   AS subcategory_name,
+            PR.requested_phrase_content     AS phrase_content,
+            PR.requested_phrase_author_name AS phrase_author_name,
+            count(CASE WHEN D.result = 'approve' THEN 1 END) AS approved_count,
+            count(CASE WHEN D.result = 'reject' THEN 1 END) AS rejected_count
+        FROM update_requests UR
+        INNER JOIN phrase_registration_requests PR ON UR.id = PR.update_request_id
+        INNER JOIN categories                   C  ON C.id = PR.requested_category_id
+        LEFT  JOIN update_request_decisions     D  ON UR.id = D.update_request_id
+        WHERE UR.id = #{id}
+            AND UR.type = 'PhraseRegistrationRequest'
+        GROUP BY
+            update_request_id,
+            finished,
+            decision_expires_at,
+            category_id,
+            category_name,
+            subcategory_id,
+            subcategory_name,
+            phrase_content,
+            phrase_author_name
+        LIMIT 1
+    </select>
+
+    <select id="selectOnePhraseModificationReqeustById" resultType="PhraseArt.infrastructure.query.UpdateRequest.UpdateRequestDetailQuery.PhraseModificationRequestDao">
+        SELECT
+            UR.id                           AS update_request_id,
+            UR.finished                     AS finished,
+            UR.decision_expires_at          AS decision_expires_at,
+            UR.final_decision_result        AS final_decision_result,
+            R_C.id                          AS requested_category_id,
+            R_C.name                        AS requested_category_name,
+            PM.requested_subcategory_id     AS requested_subcategory_id,
+            PM.requested_subcategory_name   AS requested_subcategory_name,
+            PM.requested_phrase_content     AS requested_phrase_content,
+            PM.requested_phrase_author_name AS requested_phrase_author_name,
+            C_C.id                          AS current_category_id,
+            C_C.name                        AS current_category_name,
+            PM.current_subcategory_id       AS current_subcategory_id,
+            PM.current_subcategory_name     AS current_subcategory_name,
+            PM.current_phrase_content       AS current_phrase_content,
+            PM.current_phrase_author_name   AS current_phrase_author_name,
+            count(CASE WHEN D.result = 'approve' THEN 1 END) AS approved_count,
+            count(CASE WHEN D.result = 'reject' THEN 1 END) AS rejected_count
+        FROM update_requests UR
+        INNER JOIN phrase_modification_requests PM  ON UR.id  = PM.update_request_id
+        INNER JOIN categories                   R_C ON R_C.id = PM.requested_category_id
+        INNER JOIN categories                   C_C ON C_C.id = PM.current_category_id
+        LEFT  JOIN update_request_decisions     D   ON UR.id  = D.update_request_id
+        WHERE UR.id = #{id}
+            AND UR.type = 'PhraseModificationRequest'
+        GROUP BY
+            update_request_id,
+            finished,
+            decision_expires_at,
+            requested_category_id,
+            requested_category_name,
+            requested_subcategory_id,
+            requested_subcategory_name,
+            requested_phrase_content,
+            requested_phrase_author_name,
+            current_category_id,
+            current_category_name,
+            current_subcategory_id,
+            current_subcategory_name,
+            current_phrase_content,
+            current_phrase_author_name
+        LIMIT 1
+    </select>
+
+    <select id="selectOnePhraseDeletionReqeustById" resultType="PhraseArt.infrastructure.query.UpdateRequest.UpdateRequestDetailQuery.PhraseDeletionRequestDao">
+        SELECT
+            UR.id                           AS update_request_id,
+            UR.finished                     AS finished,
+            UR.decision_expires_at          AS decision_expires_at,
+            UR.final_decision_result        AS final_decision_result,
+            C.id                            AS category_id,
+            C.name                          AS category_name,
+            SC.id                           AS subcategory_id,
+            SC.name                         AS subcategory_name,
+            PD.current_phrase_content       AS phrase_content,
+            PD.current_phrase_author_name   AS phrase_author_name,
+            count(CASE WHEN D.result = 'approve' THEN 1 END) AS approved_count,
+            count(CASE WHEN D.result = 'reject' THEN 1 END) AS rejected_count
+        FROM update_requests UR
+        INNER JOIN phrase_deletion_requests  PD ON UR.id = PD.update_request_id
+        INNER JOIN categories                C  ON C.id  = PD.current_category_id
+        LEFT JOIN subcategories              SC ON SC.id = PD.current_subcategory_id
+        LEFT  JOIN update_request_decisions  D  ON UR.id = D.update_request_id
+        WHERE UR.id = #{id}
+            AND UR.type = 'PhraseDeletionRequest'
+        GROUP BY
+            update_request_id,
+            finished,
+            decision_expires_at,
+            category_id,
+            category_name,
+            subcategory_id,
+            subcategory_name,
+            phrase_content,
+            phrase_author_name
+        LIMIT 1
+    </select>
+</mapper>

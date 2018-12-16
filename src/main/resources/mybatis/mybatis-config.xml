@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+<settings>
+    <!-- アンダースコア区切り (スネークケース) のカラム名をキャメルケースにマップする設定 -->
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
+</settings>
+<typeHandlers>
+    <typeHandler handler="org.apache.ibatis.type.LocalDateTimeTypeHandler" />
+    <typeHandler handler="org.apache.ibatis.type.LocalDateTypeHandler" />
+    <typeHandler handler="org.apache.ibatis.type.LocalTimeTypeHandler" />
+</typeHandlers>
+<mappers>
+    <!--domain用のMapping-->
+    <mapper resource="mybatis/mappers/domain/category/CategoryDomainMapper.xml"/>
+    <mapper resource="mybatis/mappers/domain/category/SubcategoryDomainMapper.xml"/>
+    <mapper resource="mybatis/mappers/domain/UserDomainMapper.xml"/>
+    <mapper resource="mybatis/mappers/domain/updateRequest/UpdateRequestCommentDomainMapper.xml"/>
+    <mapper resource="mybatis/mappers/domain/updateRequest/UpdateRequestDomainMapper.xml"/>
+    <mapper resource="mybatis/mappers/domain/phrase/PhraseDomainMapper.xml"/>
+    <mapper resource="mybatis/mappers/domain/phrase/PhraseCommentDomainMapper.xml"/>
+
+    <!--query用のMapping-->
+    <mapper resource="mybatis/mappers/query/phrase/PhraseCommentQueryMapper.xml"/>
+    <mapper resource="mybatis/mappers/query/phrase/PhraseQueryMapper.xml"/>
+    <mapper resource="mybatis/mappers/query/updateRequest/UpdateRequestCommentQueryMapper.xml"/>
+    <mapper resource="mybatis/mappers/query/updateRequest/UpdateRequestDetailQueryMapper.xml"/>
+    <mapper resource="mybatis/mappers/query/updateRequest/UpdateRequestListQueryMapper.xml"/>
+    <mapper resource="mybatis/mappers/query/category/CategoryQueryMapper.xml"/>
+    <mapper resource="mybatis/mappers/query/category/SubcategoryQueryMapper.xml"/>
+    <mapper resource="mybatis/mappers/query/UserQueryMapper.xml"/>
+</mappers>
+</configuration>

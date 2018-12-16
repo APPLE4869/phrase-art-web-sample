@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhraseArt.infrastructure.query.Category.categoryQuery.CategoryQueryMapper">
+    <sql id="selectBase">
+        SELECT
+            categories.id,
+            categories.name
+        FROM
+            categories
+    </sql>
+
+    <select id="selectAll" resultType="PhraseArt.infrastructure.query.Category.categoryQuery.CategoryDao">
+        <include refid="selectBase" />
+        ORDER BY sequence ASC
+    </select>
+
+    <select id="selectOneById" resultType="PhraseArt.infrastructure.query.Category.categoryQuery.CategoryDao">
+        <include refid="selectBase" />
+        WHERE categories.id = #{id}
+        LIMIT 1
+    </select>
+</mapper>

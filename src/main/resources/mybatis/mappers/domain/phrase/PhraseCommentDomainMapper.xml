@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhraseArt.infrastructure.domain.phrase.comment.PhraseCommentDomainMapper">
+    <sql id="selectBase">
+        select
+            id,
+            user_id,
+            phrase_id,
+            content
+        from
+            phrase_comments
+    </sql>
+
+    <select id="selectOneById" resultType="PhraseArt.infrastructure.domain.phrase.comment.PhraseCommentDao">
+        <include refid="selectBase" />
+        WHERE id = #{id} LIMIT 1
+    </select>
+
+    <insert id="insertComment">
+        INSERT INTO phrase_comments (id, user_id, phrase_id, content) VALUES
+        (#{id}, #{userId}, #{phraseId}, #{content})
+    </insert>
+
+    <update id="updateComment">
+        UPDATE phrase_comments
+        SET content = #{content}
+        WHERE id = #{id}
+    </update>
+</mapper>

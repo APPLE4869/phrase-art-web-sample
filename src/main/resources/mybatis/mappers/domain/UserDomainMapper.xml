@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhraseArt.infrastructure.domain.user.UserDomainMapper">
+    <sql id="selectBase">
+        select
+            U.id              AS id,
+            U.username        AS username,
+            U.hashed_password AS hashed_password,
+            U.freezen         AS freezen,
+            P.image_path      AS image_path
+        from
+            users U
+        LEFT JOIN profiles P ON U.id = P.user_id
+    </sql>
+
+    <select id="selectOneById" resultType="PhraseArt.infrastructure.domain.user.UserDao">
+        <include refid="selectBase" />
+        WHERE U.id = #{id} LIMIT 1
+    </select>
+    <select id="selectOneByUsername" resultType="PhraseArt.infrastructure.domain.user.UserDao">
+        <include refid="selectBase" />
+        WHERE U.username = #{username}
+        LIMIT 1
+    </select>
+
+    <insert id="insertUser">
+        INSERT INTO users (id, username, hashed_password) VALUES
+        (#{id}, #{username}, #{hashedPassword})
+    </insert>
+
+    <insert id="insertOrUpdateProfile">
+        INSERT INTO profiles (id, user_id, image_path) VALUES (#{id}, #{userId}, #{imagePath})
+        ON DUPLICATE KEY UPDATE image_path = #{imagePath}
+    </insert>
+
+    <update id="updateUser">
+        UPDATE users
+        SET username = #{username},
+        hashed_password = #{hashedPassword}
+        WHERE id = #{id}
+    </update>
+</mapper>

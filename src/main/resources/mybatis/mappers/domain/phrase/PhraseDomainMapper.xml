@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhraseArt.infrastructure.domain.phrase.phrase.PhraseDomainMapper">
+    <!-- ここから Select 用XML -->
+
+    <sql id="selectBase">
+        select
+            id,
+            category_id,
+            subcategory_id,
+            content,
+            author_name
+        from
+            phrases
+    </sql>
+
+    <select id="selectOneById" resultType="PhraseArt.infrastructure.domain.phrase.phrase.PhraseDao">
+        <include refid="selectBase" />
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
+    <select id="selectOneBy" resultType="PhraseArt.infrastructure.domain.phrase.phrase.PhraseDao">
+        <include refid="selectBase" />
+        WHERE   category_id    = #{categoryId}
+            AND subcategory_id = #{subcategoryId}
+            AND content        = #{content}
+            AND author_name    = #{authorName}
+        LIMIT 1
+    </select>
+
+    <select id="selectAllLikesByPhraseId" resultType="PhraseArt.infrastructure.domain.phrase.phrase.PhraseLikeDao">
+        select
+            phrase_id,
+            user_id
+        from
+            phrase_favorites
+        WHERE
+            phrase_id = #{phraseId}
+    </select>
+
+    <select id="selectAllFavoritesByPhraseId" resultType="PhraseArt.infrastructure.domain.phrase.phrase.PhraseFavoriteDao">
+        select
+            phrase_id,
+            user_id
+        from
+            phrase_likes
+        WHERE
+            phrase_id = #{phraseId}
+    </select>
+
+    <!-- ここまで Select 用XML -->
+
+
+
+    <!-- ここから Insert 用XML -->
+
+    <insert id="insert">
+        INSERT INTO phrases (id, category_id, subcategory_id, author_name, content) VALUES
+        (#{id}, #{categoryId}, #{subcategoryId}, #{authorName}, #{content})
+    </insert>
+
+    <insert id="insertLikeWhereNotExists">
+        INSERT INTO phrase_likes (id, phrase_id, user_id)
+        SELECT #{id}, #{phraseId}, #{userId} FROM dual
+        WHERE NOT EXISTS (
+            SELECT
+                1
+            FROM
+                phrase_likes
+            WHERE
+                phrase_id = #{phraseId} AND user_id = #{user_id}
+        )
+    </insert>
+
+    <insert id="insertFavoriteWhereNotExists">
+        INSERT INTO phrase_favorites (id, phrase_id, user_id)
+        SELECT #{id}, #{phraseId}, #{userId} FROM dummy
+        WHERE NOT EXISTS (
+            SELECT
+                1
+            FROM
+                phrase_favorites
+            WHERE
+                phrase_id = #{phraseId} AND user_id = #{user_id}
+        )
+    </insert>
+
+    <!-- ここまで Insert 用XML -->
+
+
+
+    <!-- ここから update 用XML -->
+
+    <update id="update">
+        UPDATE phrases
+            SET
+                category_id    = #{categoryId},
+                subcategory_id = #{subcategoryId},
+                author_name    = #{authorName},
+                content        = #{content}
+        WHERE id = #{id}
+    </update>
+
+    <!-- ここまで update 用XML -->
+
+
+
+    <!-- ここから delete 用XML -->
+
+    <delete id="deleteById">
+        DELETE FROM phrases WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteLikesWhereNotIn">
+        DELETE FROM phrase_likes
+        WHERE
+            phrase_id = #{phraseId}
+            AND
+                user_id NOT IN
+                <foreach item="userId" collection="userIds"
+                         open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+    </delete>
+
+    <delete id="deleteFavoritesWhereNotIn">
+        DELETE FROM phrase_favorites
+        WHERE
+            phrase_id = #{phraseId}
+            AND
+                user_id NOT IN
+                <foreach item="userId" collection="userIds"
+                         open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+    </delete>
+
+    <!-- ここまで update 用XML -->
+</mapper>
