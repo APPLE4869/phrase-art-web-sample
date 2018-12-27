@@ -6,7 +6,8 @@
     <sql id="selectBase">
         SELECT
             categories.id,
-            categories.name
+            categories.name,
+            categories.image_path
         FROM
             categories
     </sql>

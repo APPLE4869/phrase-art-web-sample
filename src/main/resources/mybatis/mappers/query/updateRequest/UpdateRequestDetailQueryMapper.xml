@@ -116,4 +116,63 @@
             phrase_author_name
         LIMIT 1
     </select>
+
+    <select id="selectOneSubcategoryModificationReqeustById" resultType="PhraseArt.infrastructure.query.UpdateRequest.UpdateRequestDetailQuery.SubcategoryModificationRequestDao">
+        SELECT
+            UR.id                                  AS update_request_id,
+            UR.finished                            AS finished,
+            UR.decision_expires_at                 AS decision_expires_at,
+            UR.final_decision_result               AS final_decision_result,
+            SM.requested_subcategory_id            AS requested_subcategory_id,
+            SM.requested_subcategory_name          AS requested_subcategory_name,
+            SM.requested_subcategory_introduction  AS requested_subcategory_introduction,
+            SM.requested_subcategory_image_path    AS requested_subcategory_image_path,
+            C.id                                   AS current_category_id,
+            C.name                                 AS current_category_name,
+            C.video_on_demand_associated           AS current_category_video_on_demand_associated,
+            SM.current_subcategory_name            AS current_subcategory_name,
+            SM.current_subcategory_introduction    AS current_subcategory_introduction,
+            SM.current_subcategory_image_path      AS current_subcategory_imagePath,
+            count(CASE WHEN D.result = 'approve' THEN 1 END) AS approved_count,
+            count(CASE WHEN D.result = 'reject' THEN 1 END)  AS rejected_count
+        FROM update_requests UR
+        INNER JOIN subcategory_modification_requests SM ON UR.id  = SM.update_request_id
+        INNER JOIN categories                        C  ON C.id = SM.current_category_id
+        LEFT  JOIN update_request_decisions          D  ON UR.id  = D.update_request_id
+        WHERE UR.id = #{id}
+            AND UR.type = 'SubcategoryModificationRequest'
+        GROUP BY
+            update_request_id,
+            finished,
+            decision_expires_at,
+            final_decision_result,
+            requested_subcategory_id,
+            requested_subcategory_name,
+            requested_subcategory_introduction,
+            requested_subcategory_image_path,
+            current_category_id,
+            current_category_name,
+            current_subcategory_name,
+            current_subcategory_introduction,
+            current_subcategory_imagePath
+        LIMIT 1
+    </select>
+
+    <select id="selectAllVideoOnDemandNameKeysBySubcategoryId" resultType="String">
+        SELECT
+            V.name_key
+        FROM
+            video_on_demands V
+        INNER JOIN subcategory_video_on_demands S ON S.video_on_demand_id = V.id
+        WHERE S.subcategory_id = #{subcategoryId}
+    </select>
+
+    <select id="selectAllVideoOnDemandNameKeysByUpdateRequestId" resultType="String">
+        SELECT
+            V.name_key
+        FROM
+            video_on_demands V
+        INNER JOIN subcategory_modification_request_video_on_demands M ON M.video_on_demand_id = V.id
+        WHERE M.update_request_id = #{updateRequestId}
+    </select>
 </mapper>

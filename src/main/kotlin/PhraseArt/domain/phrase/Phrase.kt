@@ -73,7 +73,14 @@ class Phrase : Entity {
     }
 
     fun unlike(user: User) {
-        likes.remove(PhraseLike(id, user.id))
+        run loop@{
+            likes.forEach { like ->
+                if (like.userId == user.id) {
+                    likes.remove(like)
+                    return@loop
+                }
+            }
+        }
     }
 
     fun favorite(user: User) {
@@ -82,7 +89,14 @@ class Phrase : Entity {
 
     // TODO : unfavoriteという単語が微妙なので、落ち着いたらより良いものに修正する。(unlikeの方も同様)
     fun unfavorite(user: User) {
-        favorites.remove(PhraseFavorite(id, user.id))
+        run loop@{
+            favorites.forEach { favorite ->
+                if (favorite.userId == user.id) {
+                    favorites.remove(favorite)
+                    return@loop
+                }
+            }
+        }
     }
 
     // 修正申請の内容を反映させる

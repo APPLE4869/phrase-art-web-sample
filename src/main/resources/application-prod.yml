@@ -13,6 +13,7 @@ aws:
         accessKey: ${AWS_KEY}
         secretKey: ${AWS_SECRET}
     bucket_name: ${AWS_S3_BUCKET}
+    s3_root_url: ${AWS_S3_ROOT_URL}
 
 mybatis:
     config-location: "classpath:/mybatis/mybatis-config.xml"

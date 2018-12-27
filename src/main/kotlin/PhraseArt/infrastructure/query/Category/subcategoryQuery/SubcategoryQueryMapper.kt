@@ -13,5 +13,11 @@ interface SubcategoryQueryMapper {
 
     fun selectOneById(@Param("id") id: String): SubcategoryQueryDao?
 
+    fun selectAllByCategoryIdAndWord(
+        @Param("categoryId") categoryId: String?,
+        @Param("word") word: String,
+        @Param("limit") limit: Int
+    ): List<SubcategoryQueryDao>
+
     fun selectAllVideoOnDemandNameKeysBySubcategoryId(@Param("subcategoryId") subcategoryId: String): List<String>
 }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhraseArt.infrastructure.query.Category.videoOnDemandQuery.VideoOnDemandQueryMapper">
+    <select id="selectAll" resultType="PhraseArt.infrastructure.query.Category.videoOnDemandQuery.VideoOnDemandQueryDao">
+        SELECT
+            name_key,
+            name,
+            image_path,
+            url,
+            app_deep_link
+        FROM
+            video_on_demands
+        ORDER BY sequence ASC
+    </select>
+</mapper>

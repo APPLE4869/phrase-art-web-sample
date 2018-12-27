@@ -2,6 +2,8 @@ package PhraseArt.domain.category
 
 import PhraseArt.domain.support.Entity
 import PhraseArt.domain.updateRequest.phrase.SubcategoryModificationRequest
+import jdk.nashorn.internal.runtime.regexp.joni.Config.log
+import org.springframework.web.multipart.MultipartFile
 
 class Subcategory : Entity {
     val id: SubcategoryId
@@ -45,14 +47,21 @@ class Subcategory : Entity {
         this.videoOnDemands = videoOnDemands
     }
 
-    // TODO : 画像も項目に含める
-    fun isAnyChanged(aName: String, anIntroduction: String, videoOnDemands: List<VideoOnDemand>?): Boolean {
-        if (this.name != aName) return true
+    companion object {
+        val IMAGE_PATH_SYMBOL = "subcategory"
+    }
 
-        if (this.introduction != anIntroduction) return true
+    fun isAnyChanged(aRequestedName: String, aRequestedImage: MultipartFile?, aRequestedIntroduction: String, aRequestedVideoOnDemands: List<VideoOnDemand>?): Boolean {
+        if (name != aRequestedName) return true
 
-        // videoOnDemandsの比較については、sequence順に必ず並んでいることを担保しているとして、比較の際に順番のことは考えないでよいとしている。
-        if (this.videoOnDemands?.map { it.nameKey } != videoOnDemands?.map { it.nameKey }) return true
+        if (aRequestedImage != null) return true
+
+        if (introduction != aRequestedIntroduction) return true
+
+        val currentVideoOnDemandsNameKeys = videoOnDemands?.map { it.nameKey }?.sorted() ?: emptyList()
+        val requestedVideoOnDemandsNameKeys = aRequestedVideoOnDemands?.map { it.nameKey }?.sorted() ?: emptyList()
+
+        if (!currentVideoOnDemandsNameKeys.equals(requestedVideoOnDemandsNameKeys)) return true
 
         return false
     }
@@ -61,6 +70,6 @@ class Subcategory : Entity {
         this.name = aRequest.requestedSubcategoryName
         this.introduction = aRequest.requestedSubcategoryIntroduction
         this.imagePath = aRequest.requestedSubcategoryImagePath
-        // this.videoOnDemands = aRequest.videoOnDemands TODO
+        this.videoOnDemands = aRequest.videoOnDemands
     }
 }

@@ -1,12 +1,19 @@
 package PhraseArt.infrastructure.query.UpdateRequest.UpdateRequestDetailQuery
 
 import org.apache.ibatis.annotations.Mapper
+import org.apache.ibatis.annotations.Param
 
 @Mapper
 interface UpdateRequestDetailQueryMapper {
-    fun selectOnePhraseRegistrationReqeustById(id: String): PhraseRegistrationRequestDao?
+    fun selectOnePhraseRegistrationReqeustById(@Param("id") id: String): PhraseRegistrationRequestDao?
 
-    fun selectOnePhraseModificationReqeustById(id: String): PhraseModificationRequestDao?
+    fun selectOnePhraseModificationReqeustById(@Param("id") id: String): PhraseModificationRequestDao?
 
-    fun selectOnePhraseDeletionReqeustById(id: String): PhraseDeletionRequestDao?
+    fun selectOnePhraseDeletionReqeustById(@Param("id") id: String): PhraseDeletionRequestDao?
+
+    fun selectOneSubcategoryModificationReqeustById(@Param("id") id: String): SubcategoryModificationRequestDao?
+
+    fun selectAllVideoOnDemandNameKeysBySubcategoryId(@Param("subcategoryId") subcategoryId: String): List<String>
+
+    fun selectAllVideoOnDemandNameKeysByUpdateRequestId(@Param("updateRequestId") updateRequestId: String): List<String>
 }

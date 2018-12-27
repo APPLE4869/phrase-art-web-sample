@@ -66,7 +66,7 @@ class PhraseDeletionRequest : UpdateRequest {
                 anUserId,
                 UpdateRequestType.PHRASE_DELETION,
                 false,
-                LocalDateTime.now().plusMinutes(120),
+                LocalDateTime.now().plusMinutes(240),
                 null,
                 mutableSetOf(),
                 aRequestedPhraseId,

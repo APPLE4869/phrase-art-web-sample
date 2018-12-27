@@ -15,6 +15,6 @@ data class PhraseDao(
     val likeCount: Long,
     val favoriteCount: Long,
     val commentCount: Long,
-    val currentUserLiked: Int,
-    val currentUserFavorited: Int
+    val currentUserLiked: String,
+    val currentUserFavorited: String
 )

@@ -30,6 +30,7 @@ CREATE TABLE video_on_demands (
   name varchar(50) NOT NULL COMMENT '名前',
   image_path varchar(100) NOT NULL COMMENT '画像URL',
   url varchar(255) NOT NULL COMMENT 'URL',
+  app_deep_link varchar(255) COMMENT 'アプリのディープリンク',
   sequence int(11) NOT NULL COMMENT '順序',
   created_at timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '作成日時',
   updated_at timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新日時',
@@ -197,14 +198,14 @@ CREATE TABLE subcategory_modification_requests (
 
 CREATE TABLE subcategory_modification_request_video_on_demands (
   id varchar(36) NOT NULL,
-  subcategory_modification_request_id varchar(36) NOT NULL COMMENT 'サブカテゴリー修正申請ID',
+  update_request_id varchar(36) NOT NULL COMMENT 'サブカテゴリー修正申請ID',
   video_on_demand_id varchar(36) NOT NULL COMMENT '動画配信サービスID',
   created_at timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '作成日時',
   PRIMARY KEY (id),
-  UNIQUE (subcategory_modification_request_id, video_on_demand_id),
-  FOREIGN KEY (subcategory_modification_request_id) REFERENCES subcategory_modification_requests(id),
+  UNIQUE (update_request_id, video_on_demand_id),
+  FOREIGN KEY (update_request_id) REFERENCES update_requests(id),
   FOREIGN KEY (video_on_demand_id) REFERENCES video_on_demands(id),
-  INDEX subcategory_modification_request_id_index(subcategory_modification_request_id)
+  INDEX update_request_id_index(update_request_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='サブカテゴリー修正申請と動画配信サービスの中間テーブル';
 
 CREATE TABLE phrase_registration_requests (

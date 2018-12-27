@@ -7,6 +7,7 @@ import PhraseArt.query.Phrase.PhraseCommentQuery
 import PhraseArt.query.UpdateRequest.UpdateRequestCommentQuery
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import java.time.temporal.ChronoUnit
 
 @Component
 class MyBatisUpdateRequestCommentQuery(
@@ -47,7 +48,7 @@ class MyBatisUpdateRequestCommentQuery(
             dao.username,
             dao.userImagePath,
             dao.content,
-            dao.createAt
+            dao.createAt.toLocalDateTime().truncatedTo(ChronoUnit.SECONDS)
         )
     }
 }

@@ -32,7 +32,7 @@ interface SubcategoryDomainMapper {
 
     //----- 以下、VideoOnDemand関係のメソッド -----//
 
-    fun selectAllVIdeoOnDemandsByNameKeys(
+    fun selectAllVideoOnDemandsByNameKeys(
         @Param("namekeys") nameKeys: List<String>
     ): List<VideoOnDemandDomainDao>
 
@@ -40,7 +40,7 @@ interface SubcategoryDomainMapper {
         @Param("subcategoryId") subcategoryId: String
     ): List<VideoOnDemandDomainDao>
 
-    fun selectOneVideOnDemandByNameKey(
+    fun selectOneVideoOnDemandByNameKey(
         @Param("nameKey") nameKey: String
     ): VideoOnDemandDomainDao?
 

@@ -16,11 +16,11 @@
             S.sequence     AS subcategory_sequence,
             P.content      AS phrase_content,
             P.author_name  AS author_name,
-            count(L.id)    AS like_count,
-            count(F.id)    AS favorite_count,
-            count(CM.id)   AS comment_count,
-            CASE WHEN LU.id IS NOT NULL THEN 1 ELSE 0 END AS current_user_liked,
-            CASE WHEN FU.id IS NOT NULL THEN 1 ELSE 0 END AS current_user_favorited
+            COUNT(DISTINCT CASE WHEN L.id  IS NOT NULL THEN L.id END) AS like_count,
+            COUNT(DISTINCT CASE WHEN F.id  IS NOT NULL THEN F.id END) AS favorite_count,
+            COUNT(DISTINCT CASE WHEN CM.id IS NOT NULL THEN CM.id END) AS comment_count,
+            CASE WHEN LU.id IS NOT NULL THEN "1" ELSE "0" END AS current_user_liked,
+            CASE WHEN FU.id IS NOT NULL THEN "1" ELSE "0" END AS current_user_favorited
         FROM phrases P
         INNER JOIN categories        C  ON P.category_id    = C.id
         LEFT JOIN  subcategories     S  ON P.subcategory_id = S.id
@@ -50,6 +50,28 @@
 
     <select id="selectAll" resultType="PhraseArt.infrastructure.query.Phrase.PhraseQuery.PhraseDao">
         <include refid="selectBase" />
+        <include refid="groupByBase" />
+        ORDER  BY P.created_at DESC, P.id
+        LIMIT  #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <select id="selectAllFavoriteByUserId" resultType="PhraseArt.infrastructure.query.Phrase.PhraseQuery.PhraseDao">
+        <include refid="selectBase" />
+        WHERE FU.id IS NOT NULL
+        <include refid="groupByBase" />
+        ORDER BY FU.created_at DESC, P.id
+        LIMIT  #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <!-- TODO : 数もまだ少ないので簡単にLIKE検索で実装しているが、かなり負荷が高い処理になっているので、仕様を考えて改修する。 -->
+    <select id="selectAllBySearchWord" resultType="PhraseArt.infrastructure.query.Phrase.PhraseQuery.PhraseDao">
+        <include refid="selectBase" />
+        WHERE  convert(P.content     using utf8) collate utf8_unicode_ci LIKE "%${searchWord}%"
+            OR convert(P.author_name using utf8) collate utf8_unicode_ci LIKE "%${searchWord}%"
+            OR convert(S.name        using utf8) collate utf8_unicode_ci LIKE "%${searchWord}%"
+            OR convert(C.name        using utf8) collate utf8_unicode_ci LIKE "%${searchWord}%"
         <include refid="groupByBase" />
         ORDER  BY P.created_at DESC, P.id
         LIMIT  #{limit}

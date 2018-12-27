@@ -44,6 +44,7 @@
             PD.current_phrase_author_name         AS pd_current_phrase_author_name,
 
             <!--ここから subcategory_modification_requests のカラム-->
+            SMC.video_on_demand_associated        AS sm_category_video_on_demand_associated,
             SM.requested_subcategory_id           AS sm_requested_subcategory_id,
             SM.requested_subcategory_name         AS sm_requested_subcategory_name,
             SM.requested_subcategory_introduction AS sm_requested_subcategory_introduction,
@@ -54,10 +55,11 @@
             SM.current_subcategory_image_path     AS sm_current_subcategory_image_path
         FROM
             update_requests UR
-        LEFT JOIN phrase_registration_requests      PR ON UR.id = PR.update_request_id
-        LEFT JOIN phrase_modification_requests      PM ON UR.id = PM.update_request_id
-        LEFT JOIN phrase_deletion_requests          PD ON UR.id = PD.update_request_id
-        LEFT JOIN subcategory_modification_requests SM ON UR.id = SM.update_request_id
+        LEFT JOIN phrase_registration_requests      PR  ON UR.id = PR.update_request_id
+        LEFT JOIN phrase_modification_requests      PM  ON UR.id = PM.update_request_id
+        LEFT JOIN phrase_deletion_requests          PD  ON UR.id = PD.update_request_id
+        LEFT JOIN subcategory_modification_requests SM  ON UR.id = SM.update_request_id
+        LEFT JOIN categories                        SMC ON SMC.id = SM.current_category_id
     </sql>
 
     <select
@@ -107,6 +109,15 @@
         <include refid="selectBase" />
         WHERE   PD.requested_phrase_id = #{phraseId}
             AND UR.finished            = 0
+        LIMIT 1
+    </select>
+
+    <select
+            id="selectOneUnfinishedSubcategoryModificationRequestBySubcategoryId"
+            resultType="PhraseArt.infrastructure.domain.updateRequest.updateRequest.UpdateRequestDao">
+        <include refid="selectBase" />
+        WHERE   SM.requested_subcategory_id = #{subcategoryId}
+        AND UR.finished            = 0
         LIMIT 1
     </select>
 
@@ -259,4 +270,47 @@
     </insert>
 
     <!-- ここまで Insert 用XML -->
+
+
+
+    <!-- ここから VideoOnDemand 関係のXML -->
+
+    <sql id="selectBaseForVideoOnDemand">
+        SELECT
+            V.id          AS id,
+            V.name_key    AS name_key,
+            V.name        AS name,
+            V.image_path  AS image_path,
+            V.url         AS url,
+            V.sequence    AS sequence
+        FROM
+            video_on_demands V
+    </sql>
+
+    <select id="selectAllVideoOnDemandsByUpdateRequestId" resultType="PhraseArt.infrastructure.domain.category.subcategory.VideoOnDemandDomainDao">
+        <include refid="selectBaseForVideoOnDemand" />
+        INNER JOIN subcategory_modification_request_video_on_demands S ON V.id = S.video_on_demand_id
+        WHERE
+            S.update_request_id = #{updateRequestId}
+        ORDER BY V.sequence
+    </select>
+
+    <select id="selectOneVideoOnDemandByNameKey" resultType="PhraseArt.infrastructure.domain.category.subcategory.VideoOnDemandDomainDao">
+        <include refid="selectBaseForVideoOnDemand" />
+        WHERE
+            V.name_key = #{nameKey}
+        LIMIT 1
+    </select>
+
+    <insert id="insertRequestVideoOnDemand">
+        INSERT INTO subcategory_modification_request_video_on_demands (id, update_request_id, video_on_demand_id) VALUES
+        (#{id}, #{updateRequestId}, #{videoOnDemandId})
+    </insert>
+
+    <delete id="deleteAllRequestVideoOnDemandBySubcategoryId">
+        DELETE FROM subcategory_modification_request_video_on_demands
+        WHERE update_request_id = #{updateRequestId}
+    </delete>
+
+    <!-- ここまで VideoOnDemand 関係のXML -->
 </mapper>

@@ -39,6 +39,16 @@ class User : Entity {
         this.profile = aProfile
     }
 
+    fun changeUsername(aUsername: String) {
+        this.username = aUsername
+    }
+
+    fun changePassword(aCurrentPassword: Password, aNewPassword: Password, aConfirmNewPassword: Password) {
+        assertArgumentTrue(aCurrentPassword.isEquals(hashedPassword), "現在のパスワードが正しくありません")
+        assertArgumentTrue(aNewPassword.isEquals(aConfirmNewPassword.encryptedPassword()), "確認用のパスワードが一致しません")
+        this.hashedPassword = aNewPassword.encryptedPassword()
+    }
+
     fun changeProfileImage(imagePath: String) {
         if (profile != null)
             // profileがimmutableのため、changeImageを実行できない可能性があるのでcastしろと警告を受けるので、

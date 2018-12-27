@@ -1,8 +1,6 @@
 package PhraseArt.infrastructure.domain.updateRequest.updateRequest
 
-import PhraseArt.domain.category.CategoryId
-import PhraseArt.domain.category.Subcategory
-import PhraseArt.domain.category.SubcategoryId
+import PhraseArt.domain.category.*
 import PhraseArt.domain.phrase.PhraseId
 import PhraseArt.domain.updateRequest.*
 import PhraseArt.domain.updateRequest.phrase.PhraseRegistrationRequest
@@ -17,8 +15,12 @@ import PhraseArt.domain.updateRequest.UpdateRequestType
 import PhraseArt.domain.updateRequest.phrase.PhraseDeletionRequest
 import PhraseArt.domain.updateRequest.phrase.PhraseModificationRequest
 import PhraseArt.domain.updateRequest.phrase.SubcategoryModificationRequest
+import PhraseArt.infrastructure.domain.category.subcategory.SubcategoryDomainMapper
+import PhraseArt.infrastructure.domain.category.subcategory.VideoOnDemandDomainDao
 
-// TODO : 1クラスで受け持つ責務がかなり大きいので、各申請用のクラスにそれぞれのロジックを切り出す。
+// TODO : Railsのポリモーフィックの仕組みに近いことを実現しているため、かなり醜いことになっている。
+// MyBatis以外のもう少しうまくやれるORMに乗り換えるか、それでもきつそうなら実装方針を変える。
+// TODO :VideoOnDemandクラスをCategoryパッケージと共有で使っているのが依存が生まれてよくないため、別クラスにするなり改修する。
 @Component
 class MyBatisUpdateRequestRepository(
     @Autowired val updateRequestDomainMapper : UpdateRequestDomainMapper,
@@ -105,6 +107,8 @@ class MyBatisUpdateRequestRepository(
                         updateRequest.currentSubcategoryIntroduction,
                         updateRequest.currentSubcategoryImagePath
                     )
+
+                    storeVideoOnDemands(updateRequest)
                 }
             }
         } else {
@@ -170,7 +174,10 @@ class MyBatisUpdateRequestRepository(
     }
 
     override fun subcategoryModificationRequestOfSubcategoryId(subcategoryId: SubcategoryId): UpdateRequest? {
-        return null
+        return updateRequestDomainMapper.selectOneUnfinishedSubcategoryModificationRequestBySubcategoryId(subcategoryId.value)?.let {
+            val decisions = decisionDomainMapper.allDecisionsOfUpdateRequestId(it.updateRequestId)
+            daoToUpdateRequest(it, decisions)
+        }
     }
 
     private fun daoToUpdateRequest(dao: UpdateRequestDao, decisions: List<DecisionDao>): UpdateRequest? {
@@ -231,6 +238,11 @@ class MyBatisUpdateRequestRepository(
                 )
             }
             UpdateRequestType.SUBCATEGORY_MODIFICATION.value -> { // サブカテゴリー修正申請の場合
+                var videoOnDemands: MutableList<VideoOnDemand>? = null
+                if (dao.smCategoryVideoOnDemandAssociated == true) {
+                    videoOnDemands = videoOnDemandOfUpdateRequest(dao.updateRequestId)
+                }
+
                 return SubcategoryModificationRequest(
                     UpdateRequestId(dao.updateRequestId),
                     UserId(dao.userId),
@@ -243,10 +255,11 @@ class MyBatisUpdateRequestRepository(
                     dao.smRequestedSubcategoryName as String,
                     dao.smRequestedSubcategoryIntroduction,
                     dao.smRequestedSubcategoryImagePath,
-                    CategoryId(dao.pdCurrentCategoryId as String),
+                    CategoryId(dao.smCurrentCategoryId as String),
                     dao.smCurrentSubcategoryName as String,
                     dao.smCurrentSubcategoryIntroduction,
-                    dao.smCurrentSubcategoryImagePath
+                    dao.smCurrentSubcategoryImagePath,
+                    videoOnDemands
                 )
             }
             else -> {
@@ -256,6 +269,9 @@ class MyBatisUpdateRequestRepository(
         }
     }
 
+    // TODO : SubcategoryRepositoryでも利用しているものをそのまま持ってきている。
+    // 原因としては、CategoryパッケージとUpdateRequestパッケージで同じVideoOnDemand Valueオブジェクトを利用しているため。
+    // よくない状態なので、2つ別々のクラスを作るなり、より良い方法を考えて改修する。
     private fun daoToDecisions(decisions: List<DecisionDao>): MutableSet<Decision> {
         return decisions.map {
             Decision(
@@ -265,6 +281,37 @@ class MyBatisUpdateRequestRepository(
                 it.result
             )
         }.toMutableSet()
+    }
+
+    private fun videoOnDemandOfUpdateRequest(updateRequestId: String): MutableList<VideoOnDemand> {
+        return updateRequestDomainMapper.selectAllVideoOnDemandsByUpdateRequestId(updateRequestId).map {
+            daoToVideoOnDemand(it)
+        }.toMutableList()
+    }
+
+    private fun daoToVideoOnDemand(dao: VideoOnDemandDomainDao): VideoOnDemand {
+        return VideoOnDemand(
+            VideOnDemandNameKeyType.fromValue(dao.nameKey) ?: throw IllegalArgumentException("動画配信サービスの名前キーが不正です"),
+            dao.name,
+            dao.imagePath,
+            dao.url,
+            dao.sequence
+        )
+    }
+
+    private fun storeVideoOnDemands(request: SubcategoryModificationRequest) {
+        updateRequestDomainMapper.deleteAllRequestVideoOnDemandBySubcategoryId(request.id.value)
+
+        val videoOnDemands = request.videoOnDemands?.toList()
+        if (videoOnDemands == null || videoOnDemands.count() == 0) {
+            return
+        }
+
+        videoOnDemands.forEach { videoOnDemand ->
+            val videoOnDemand = updateRequestDomainMapper.selectOneVideoOnDemandByNameKey(videoOnDemand.nameKey.value) ?:
+                throw IllegalArgumentException("動画配信サービスの名前キーが不正です")
+            updateRequestDomainMapper.insertRequestVideoOnDemand(uuid(), request.id.value, videoOnDemand.id)
+        }
     }
 
     private fun uuid(): String {

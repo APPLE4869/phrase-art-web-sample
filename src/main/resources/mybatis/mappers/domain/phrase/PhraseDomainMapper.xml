@@ -36,7 +36,7 @@
             phrase_id,
             user_id
         from
-            phrase_favorites
+            phrase_likes
         WHERE
             phrase_id = #{phraseId}
     </select>
@@ -46,7 +46,7 @@
             phrase_id,
             user_id
         from
-            phrase_likes
+            phrase_favorites
         WHERE
             phrase_id = #{phraseId}
     </select>
@@ -71,20 +71,20 @@
             FROM
                 phrase_likes
             WHERE
-                phrase_id = #{phraseId} AND user_id = #{user_id}
+                phrase_id = #{phraseId} AND user_id = #{userId}
         )
     </insert>
 
     <insert id="insertFavoriteWhereNotExists">
         INSERT INTO phrase_favorites (id, phrase_id, user_id)
-        SELECT #{id}, #{phraseId}, #{userId} FROM dummy
+        SELECT #{id}, #{phraseId}, #{userId} FROM dual
         WHERE NOT EXISTS (
             SELECT
                 1
             FROM
                 phrase_favorites
             WHERE
-                phrase_id = #{phraseId} AND user_id = #{user_id}
+                phrase_id = #{phraseId} AND user_id = #{userId}
         )
     </insert>
 
@@ -114,28 +114,44 @@
         DELETE FROM phrases WHERE id = #{id}
     </delete>
 
+    <delete id="deleteCommentsByPhraseId">
+        DELETE FROM phrase_comments WHERE phrase_id = #{phraseId}
+    </delete>
+
+    <delete id="deleteLikesByPhraseId">
+        DELETE FROM phrase_likes WHERE phrase_id = #{phraseId}
+    </delete>
+
+    <delete id="deleteFavoritesByPhraseId">
+        DELETE FROM phrase_favorites WHERE phrase_id = #{phraseId}
+    </delete>
+
     <delete id="deleteLikesWhereNotIn">
         DELETE FROM phrase_likes
         WHERE
             phrase_id = #{phraseId}
-            AND
-                user_id NOT IN
-                <foreach item="userId" collection="userIds"
-                         open="(" separator="," close=")">
-                    #{userId}
-                </foreach>
+            <if test="userIds.size() > 0">
+                AND
+                    user_id NOT IN
+                    <foreach item="userId" collection="userIds"
+                             open="(" separator="," close=")">
+                        #{userId}
+                    </foreach>
+            </if>
     </delete>
 
     <delete id="deleteFavoritesWhereNotIn">
         DELETE FROM phrase_favorites
         WHERE
             phrase_id = #{phraseId}
-            AND
-                user_id NOT IN
-                <foreach item="userId" collection="userIds"
-                         open="(" separator="," close=")">
-                    #{userId}
-                </foreach>
+            <if test="userIds.size() > 0">
+                AND
+                    user_id NOT IN
+                    <foreach item="userId" collection="userIds"
+                             open="(" separator="," close=")">
+                        #{userId}
+                    </foreach>
+            </if>
     </delete>
 
     <!-- ここまで update 用XML -->

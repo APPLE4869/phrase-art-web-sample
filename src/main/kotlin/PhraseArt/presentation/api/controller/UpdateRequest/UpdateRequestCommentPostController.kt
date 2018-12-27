@@ -11,7 +11,7 @@ import javax.validation.Valid
 
 @RestController
 class UpdateRequestCommentPostController(@Autowired val updateRequestCommentService : UpdateRequestCommentService) : PrivateApiController() {
-    @PostMapping("/updateRequests/comment")
+    @PostMapping("/update_requests/comment")
     @ResponseStatus(value = HttpStatus.OK)
     fun submit(@Valid @RequestBody form: UpdateRequestCommentForm, principal: Principal) {
         updateRequestCommentService.post(form, principal.name)

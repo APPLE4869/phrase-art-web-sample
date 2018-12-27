@@ -5,12 +5,20 @@ import PhraseArt.domain.phrase.PhraseId
 import PhraseArt.query.Dto.Phrase.PhraseCommentQueryDto
 import PhraseArt.query.Phrase.PhraseCommentQuery
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import java.time.temporal.ChronoUnit
 
 @Component
 class MyBatisPhraseCommentQuery(
     @Autowired private val phraseCommentQueryMapper: PhraseCommentQueryMapper
 ) : PhraseCommentQuery {
+    @Value("\${aws.bucket_name}")
+    val bucketName: String = ""
+
+    @Value("\${aws.s3_root_url}")
+    val s3RootUrl: String = ""
+
     override fun selectAllLatestComments(phraseId: PhraseId): List<PhraseCommentQueryDto> {
         return phraseCommentQueryMapper.selectAllLatestComments(phraseId.value).map {
             daoToPhraseComment(it)
@@ -30,13 +38,19 @@ class MyBatisPhraseCommentQuery(
     }
 
     private fun daoToPhraseComment(dao: PhraseCommentQueryDao): PhraseCommentQueryDto {
+        val image =
+            if (dao.userImagePath != null)
+                "${s3RootUrl}/${bucketName}/${dao.userImagePath}"
+            else
+                null
+
         return PhraseCommentQueryDto(
             dao.commentId,
             dao.userId,
             dao.username,
-            dao.userImagePath,
+            image,
             dao.content,
-            dao.createAt
+            dao.createAt.toLocalDateTime().truncatedTo(ChronoUnit.SECONDS)
         )
     }
 }

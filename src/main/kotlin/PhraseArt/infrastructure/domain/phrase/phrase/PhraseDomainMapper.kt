@@ -51,6 +51,12 @@ interface PhraseDomainMapper {
 
     fun deleteById(@Param("id") id: String)
 
+    fun deleteCommentsByPhraseId(@Param("phraseId") phraseId: String)
+
+    fun deleteLikesByPhraseId(@Param("phraseId") phraseId: String)
+
+    fun deleteFavoritesByPhraseId(@Param("phraseId") phraseId: String)
+
     fun deleteLikesWhereNotIn(
         @Param("phraseId") phraseId: String,
         @Param("userIds") userIds: List<String>

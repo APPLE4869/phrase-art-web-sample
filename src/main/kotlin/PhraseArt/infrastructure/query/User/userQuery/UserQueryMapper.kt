@@ -1,4 +1,4 @@
-package PhraseArt.infrastructure.query.userQuery
+package PhraseArt.infrastructure.query.User.userQuery
 
 import org.apache.ibatis.annotations.Mapper
 import org.apache.ibatis.annotations.Param

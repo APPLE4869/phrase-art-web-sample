@@ -5,5 +5,6 @@ package PhraseArt.infrastructure.query.Category.categoryQuery
 
 data class CategoryDao(
     val id: String,
-    val name: String
+    val name: String,
+    val imagePath: String?
 )

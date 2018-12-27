@@ -23,4 +23,8 @@ class Password : Value {
     fun encryptedPassword(): String {
         return BCryptPasswordEncoder().encode(value)
     }
+
+    fun isEquals(aHashedPassword: String): Boolean {
+        return BCryptPasswordEncoder().matches(value, aHashedPassword)
+    }
 }

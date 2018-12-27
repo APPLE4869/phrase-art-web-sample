@@ -17,18 +17,26 @@ class PhrasesController(@Autowired val phraseService : PhraseService) : PublicAp
         return mutableMapOf("phrases" to phraseService.findAllPhrases(principalName(), offset))
     }
 
+    @RequestMapping("/phrases/search")
+    fun search(
+        @RequestParam(name="searchWord") searchWord: String,
+        @RequestParam(name="offset", defaultValue="0") offset: Int
+    ): MutableMap<String, List<PhraseQueryDto>> {
+        return mutableMapOf("phrases" to phraseService.findAllPhraseBySearchWord(principalName(), searchWord, offset))
+    }
+
     @RequestMapping("/categories/{categoryId}/phrases")
     fun listNarrowedDownByCategoryId(
-            @PathVariable("categoryId") categoryId: String,
-            @RequestParam(name="offset", defaultValue="0") offset: Int
+        @PathVariable("categoryId") categoryId: String,
+        @RequestParam(name="offset", defaultValue="0") offset: Int
     ): MutableMap<String, List<PhraseQueryDto>> {
         return mutableMapOf("phrases" to phraseService.findAllPhrasesByCategoryId(categoryId, principalName(), offset))
     }
 
     @RequestMapping("/subcategories/{subcategoryId}/phrases")
     fun listNarrowedDownBySubcategoryId(
-            @PathVariable("subcategoryId") subcategoryId: String,
-            @RequestParam(name="offset", defaultValue="0") offset: Int
+        @PathVariable("subcategoryId") subcategoryId: String,
+        @RequestParam(name="offset", defaultValue="0") offset: Int
     ): MutableMap<String, List<PhraseQueryDto>> {
         return mutableMapOf("phrases" to phraseService.findAllPhrasesBySubcategoryId(subcategoryId, principalName(), offset))
     }

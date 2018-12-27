@@ -65,7 +65,7 @@
             video_on_demands V
     </sql>
 
-    <select id="selectAllVIdeoOnDemandsByNameKeys" resultType="PhraseArt.infrastructure.domain.category.subcategory.VideoOnDemandDomainDao">
+    <select id="selectAllVideoOnDemandsByNameKeys" resultType="PhraseArt.infrastructure.domain.category.subcategory.VideoOnDemandDomainDao">
         <include refid="selectBaseForVideoOnDemand" />
         WHERE name_key in
             <foreach item="namekey" collection="namekeys"
@@ -83,7 +83,7 @@
         ORDER BY V.sequence
     </select>
 
-    <select id="selectOneVideOnDemandByNameKey" resultType="PhraseArt.infrastructure.domain.category.subcategory.VideoOnDemandDomainDao">
+    <select id="selectOneVideoOnDemandByNameKey" resultType="PhraseArt.infrastructure.domain.category.subcategory.VideoOnDemandDomainDao">
         <include refid="selectBaseForVideoOnDemand" />
         WHERE
             V.name_key = #{nameKey}
@@ -95,7 +95,7 @@
             (#{id}, #{subcategoryId}, #{videoOnDemandId})
     </insert>
 
-    <delete id="deleteSubcategoryVideoOnDemand">
+    <delete id="deleteAllSubcategoryVideoOnDemandBySubcategoryId">
         DELETE FROM subcategory_video_on_demands
             WHERE subcategory_id = #{subcategoryId}
     </delete>

@@ -1,4 +1,4 @@
-package PhraseArt.query.Dto
+package PhraseArt.query.Dto.User
 
 data class UserQueryDto(
     val id: String,

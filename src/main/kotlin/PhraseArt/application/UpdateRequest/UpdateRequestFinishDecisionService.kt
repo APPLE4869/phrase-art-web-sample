@@ -22,12 +22,8 @@ import org.springframework.transaction.annotation.Transactional
 class UpdateRequestFinishDecisionService(
     @Autowired val categoryRepository : CategoryRepository,
     @Autowired val phraseRepository: PhraseRepository,
-    @Autowired val userRepository: UserRepository,
     @Autowired val updateRequestRepository : UpdateRequestRepository,
-    @Autowired val subcategoryRepository: SubcategoryRepository,
-    @Autowired val decisionRepository : DecisionRepository,
-    @Autowired val updateRequestQuery : UpdateRequestListQuery,
-    @Autowired val phraseUpdateRequestDomainService : PhraseUpdateRequestDomainService
+    @Autowired val subcategoryRepository: SubcategoryRepository
 ) {
     // TODO : ひとまず数が多くないのでトランザクションをまとめているが、数が増えるようなら分割するように改修する。
     @Transactional

@@ -101,7 +101,7 @@ class PhraseModificationRequest: UpdateRequest, PhraseUpdateRequestIncludedSubca
                 anUserId,
                 UpdateRequestType.PHRASE_MODIFICATION,
                 false,
-                LocalDateTime.now().plusMinutes(120),
+                LocalDateTime.now().plusMinutes(180),
                 null,
                 mutableSetOf(),
                 aRequestedPhraseId,

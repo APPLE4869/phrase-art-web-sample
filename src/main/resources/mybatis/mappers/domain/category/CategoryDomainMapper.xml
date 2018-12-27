@@ -14,7 +14,7 @@
             categories C
     </sql>
 
-    <select id="categoryOfId" resultType="PhraseArt.infrastructure.domain.category.category.CategoryDomainDao">
+    <select id="selectOneById" resultType="PhraseArt.infrastructure.domain.category.category.CategoryDomainDao">
         <include refid="selectBase" />
         WHERE C.id = #{id}
         LIMIT 1

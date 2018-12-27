@@ -44,5 +44,6 @@ data class UpdateRequestListItemDao(
 
         // Decisionの件数
         val approvedCount: Long,
-        val rejectedCount: Long
+        val rejectedCount: Long,
+        val commentCount: Long
 )

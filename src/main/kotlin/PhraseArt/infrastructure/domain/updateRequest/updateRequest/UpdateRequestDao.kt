@@ -40,6 +40,7 @@ data class UpdateRequestDao(
     val pdCurrentPhraseAuthorName: String?,
 
     // SubcategoryModificationRequest(サブカテゴリー修正申請)用のプロパティ
+    val smCategoryVideoOnDemandAssociated: Boolean?,
     val smRequestedSubcategoryId: String?,
     val smRequestedSubcategoryName: String?,
     val smRequestedSubcategoryIntroduction: String?,

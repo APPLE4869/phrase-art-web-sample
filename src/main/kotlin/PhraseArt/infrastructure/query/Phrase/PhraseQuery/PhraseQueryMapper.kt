@@ -11,6 +11,19 @@ interface PhraseQueryMapper {
         @Param("offset") offset: Int
     ): List<PhraseDao>
 
+    fun selectAllFavoriteByUserId(
+        @Param("userId") userId: String,
+        @Param("limit") limit: Int,
+        @Param("offset") offset: Int
+    ): List<PhraseDao>
+
+    fun selectAllBySearchWord(
+        @Param("userId") userId: String?,
+        @Param("searchWord") searchWord: String,
+        @Param("limit") limit: Int,
+        @Param("offset") offset: Int
+    ): List<PhraseDao>
+
     fun selectAllByCategoryId(
         @Param("categoryId") categoryId: String,
         @Param("userId") userId: String?,

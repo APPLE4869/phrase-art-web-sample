@@ -1,8 +1,8 @@
-package PhraseArt.infrastructure.query.userQuery
+package PhraseArt.infrastructure.query.User.userQuery
 
 import PhraseArt.domain.user.UserId
-import PhraseArt.query.Dto.UserQueryDto
-import PhraseArt.query.UserQuery
+import PhraseArt.query.Dto.User.UserQueryDto
+import PhraseArt.query.User.UserQuery
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 

@@ -3,6 +3,7 @@ package PhraseArt.domain.updateRequest.phrase
 import PhraseArt.domain.category.CategoryId
 import PhraseArt.domain.category.Subcategory
 import PhraseArt.domain.category.SubcategoryId
+import PhraseArt.domain.category.VideoOnDemand
 import PhraseArt.domain.phrase.PhraseId
 import PhraseArt.domain.updateRequest.*
 import PhraseArt.domain.user.UserId
@@ -44,6 +45,7 @@ class SubcategoryModificationRequest: UpdateRequest {
             this.assertArgumentLength(value, 100, "画像パスは100文字以内にしてください")
             field = value
         }
+    var videoOnDemands: MutableList<VideoOnDemand>?
 
     constructor(
         anId: UpdateRequestId,
@@ -60,7 +62,8 @@ class SubcategoryModificationRequest: UpdateRequest {
         aCurrentCategoryId: CategoryId,
         aCurrentSubcategoryName: String,
         aCurrentSubcategoryIntroduction: String?,
-        aCurrentSubcategoryImagePath: String?
+        aCurrentSubcategoryImagePath: String?,
+        videoOnDemands: MutableList<VideoOnDemand>?
     ): super(anId, anUserId, aType, finished, expiresDatetime, aFinalDecisionResult, decisions) {
         this.decisions = decisions
         this.requestedSubcategoryId = aRequestedSubcategoryId
@@ -71,6 +74,7 @@ class SubcategoryModificationRequest: UpdateRequest {
         this.currentSubcategoryName = aCurrentSubcategoryName
         this.currentSubcategoryIntroduction = aCurrentSubcategoryIntroduction
         this.currentSubcategoryImagePath = aCurrentSubcategoryImagePath
+        this.videoOnDemands = videoOnDemands
     }
 
     companion object {
@@ -81,14 +85,15 @@ class SubcategoryModificationRequest: UpdateRequest {
             aRequestedSubcategoryName: String,
             aRequestedSubcategoryIntroduction: String?,
             aRequestedSubcategoryImagePath: String?,
-            currentSubcategory: Subcategory
+            currentSubcategory: Subcategory,
+            videoOnDemands: List<VideoOnDemand>?
         ): SubcategoryModificationRequest {
             return SubcategoryModificationRequest(
                 anId,
                 anUserId,
                 UpdateRequestType.SUBCATEGORY_MODIFICATION,
                 false,
-                LocalDateTime.now().plusMinutes(20),
+                LocalDateTime.now().plusMinutes(240),
                 null,
                 mutableSetOf(),
                 aRequestedSubcategoryId,
@@ -98,7 +103,8 @@ class SubcategoryModificationRequest: UpdateRequest {
                 currentSubcategory.category.id,
                 currentSubcategory.name,
                 currentSubcategory.introduction,
-                currentSubcategory.imagePath
+                currentSubcategory.imagePath,
+                videoOnDemands?.toMutableList()
             )
         }
     }

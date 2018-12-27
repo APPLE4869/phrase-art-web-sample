@@ -5,19 +5,20 @@
 <mapper namespace="PhraseArt.infrastructure.query.Category.subcategoryQuery.SubcategoryQueryMapper">
     <sql id="selectBase">
         SELECT
-            S.id           AS id,
-            C.id           AS category_id,
-            C.name         AS category_name,
-            S.name         AS name,
-            S.image_path   AS image_path,
-            S.introduction AS introduction,
-            S.sequence     AS sequence
+            S.id                         AS id,
+            C.id                         AS category_id,
+            C.name                       AS category_name,
+            C.video_on_demand_associated AS video_on_demand_associated,
+            S.name                       AS name,
+            S.image_path                 AS image_path,
+            S.introduction               AS introduction,
+            S.sequence                   AS sequence
         FROM subcategories S
+        INNER JOIN categories C ON C.id = S.category_id
     </sql>
 
     <select id="selectAllByCategoryId" resultType="PhraseArt.infrastructure.query.Category.subcategoryQuery.SubcategoryQueryDao">
         <include refid="selectBase" />
-        INNER JOIN categories C ON C.id = S.category_id
         WHERE S.category_id = #{categoryId}
         ORDER BY S.sequence ASC
         LIMIT #{limit}
@@ -26,9 +27,19 @@
 
     <select id="selectOneById" resultType="PhraseArt.infrastructure.query.Category.subcategoryQuery.SubcategoryQueryDao">
         <include refid="selectBase" />
-        INNER JOIN categories C ON C.id = S.category_id
         WHERE S.id = #{id}
         LIMIT 1
+    </select>
+
+    <select id="selectAllByCategoryIdAndWord" resultType="PhraseArt.infrastructure.query.Category.subcategoryQuery.SubcategoryQueryDao">
+        <include refid="selectBase" />
+        WHERE convert(S.name using utf8) collate utf8_unicode_ci LIKE "%${word}%"
+            <if test="categoryId != null">
+                AND
+                    C.id = #{categoryId}
+            </if>
+        ORDER BY S.sequence ASC
+        LIMIT #{limit}
     </select>
 
     <select id="selectAllVideoOnDemandNameKeysBySubcategoryId" resultType="String">

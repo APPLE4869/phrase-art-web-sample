@@ -13,6 +13,7 @@ aws:
         accessKey: ${PHRASE_ART_AWS_KEY}
         secretKey: ${PHRASE_ART_AWS_SECRET}
     bucket_name: ${PHRASE_ART_AWS_S3_BUCKET}
+    s3_root_url: ${PHRASE_ART_AWS_S3_ROOT_URL}
 
 mybatis:
     config-location: "classpath:/mybatis/mybatis-config.xml"

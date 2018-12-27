@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 class UpdateRequestCommentListController(@Autowired val updateRequestCommentService : UpdateRequestCommentService) : PublicApiController() {
-    @GetMapping("/updateRequests/{updateRequestId}/comments/previous")
+    @GetMapping("/update_requests/{updateRequestId}/comments/previous")
     @ResponseStatus(value = HttpStatus.OK)
     fun priviousList(
         @PathVariable("updateRequestId") updateRequestId: String,
@@ -19,7 +19,7 @@ class UpdateRequestCommentListController(@Autowired val updateRequestCommentServ
         return mutableMapOf("comments" to updateRequestCommentService.previousList(updateRequestId, offset, latestCommentId))
     }
 
-    @GetMapping("/updateRequests/{updateRequestId}/comments/following")
+    @GetMapping("/update_requests/{updateRequestId}/comments/following")
     @ResponseStatus(value = HttpStatus.OK)
     fun followingList(
         @PathVariable("updateRequestId") updateRequestId: String,

@@ -41,7 +41,12 @@ class MyBatisPhraseRepository(
 
     // TODO : PhraseにひもづくCommentやLike, Favoriteも全て削除するようにする。
     override fun remove(phrase: Phrase) {
-        return phraseMapper.deleteById(phrase.id.value)
+        // リレーションのある他テーブルのレコードを削除
+        phraseMapper.deleteCommentsByPhraseId(phrase.id.value)
+        phraseMapper.deleteLikesByPhraseId(phrase.id.value)
+        phraseMapper.deleteFavoritesByPhraseId(phrase.id.value)
+
+        phraseMapper.deleteById(phrase.id.value)
     }
 
     private fun daoToPhrase(dao: PhraseDao): Phrase {
@@ -69,7 +74,7 @@ class MyBatisPhraseRepository(
     // TODO : Bulk Insertではないため、負荷が高くなりやすいので、より良いやり方を見つけたら改修する。
     private fun storeFavorite(phraseId: PhraseId, favorites: MutableSet<PhraseFavorite>) {
         favorites.forEach { favorite ->
-            phraseMapper.insertLikeWhereNotExists(uuid(), favorite.phraseId.value, favorite.userId.value)
+            phraseMapper.insertFavoriteWhereNotExists(uuid(), favorite.phraseId.value, favorite.userId.value)
         }
 
         val userIds = favorites.map { it.userId.value }

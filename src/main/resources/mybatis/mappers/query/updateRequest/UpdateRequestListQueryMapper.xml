@@ -35,8 +35,9 @@
             SM.requested_subcategory_introduction AS sm_requested_subcategory_introduction,
             SM_C.id                               AS smc_category_id,
             SM_C.name                             AS smc_category_name,
-            count(CASE WHEN RD.result = 'approve' THEN 1 END) AS approved_count,
-            count(CASE WHEN RD.result = 'reject' THEN 1 END)  AS rejected_count
+            COUNT(DISTINCT CASE WHEN RD.result = 'approve' THEN RD.id END)  AS approved_count,
+            COUNT(DISTINCT CASE WHEN RD.result = 'reject'  THEN RD.id END)  AS rejected_count,
+            COUNT(DISTINCT CASE WHEN UC.id IS NOT NULL THEN UC.id END)      AS comment_count
         FROM
             update_requests UR
         <!--update_requestsに紐づく名言登録・名言修正・名言削除・サブカテゴリー修正申請のJOIN ↓-->
@@ -44,6 +45,7 @@
         LEFT JOIN phrase_modification_requests      PM   ON UR.id = PM.update_request_id
         LEFT JOIN phrase_deletion_requests          PD   ON UR.id = PD.update_request_id
         LEFT JOIN subcategory_modification_requests SM   ON UR.id = SM.update_request_id
+        LEFT JOIN update_request_comments           UC   ON UR.id = UC.update_request_id
 
         <!--各申請に紐づく、表示に必要なデータのJOIN ↓-->
         LEFT JOIN categories                        PR_C ON PR_C.id = PR.requested_category_id

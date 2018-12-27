@@ -1,7 +1,6 @@
 package PhraseArt.application
 
 import PhraseArt.domain.user.UserRepository
-import jdk.nashorn.internal.runtime.regexp.joni.Config.log
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.User.withUsername

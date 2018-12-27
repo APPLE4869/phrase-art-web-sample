@@ -4,5 +4,6 @@ data class VideoOnDemandQueryDao(
     val nameKey: String,
     val name: String,
     val imagePath: String,
-    val url: String
+    val url: String,
+    val appDeepLink: String?
 )

@@ -6,4 +6,6 @@ interface SubcategoryQuery {
     fun findAllSubcategories(categoryId: String, offset: Int=0): List<SubcategoryQueryDto>
 
     fun findSubcategory(id: String): SubcategoryQueryDto?
+
+    fun findAllCandidatesSubcategories(categoryId: String?, word: String): List<SubcategoryQueryDto>
 }

@@ -1,9 +1,11 @@
 package PhraseArt.infrastructure.domain.updateRequest.updateRequest
 
+import PhraseArt.infrastructure.domain.category.subcategory.VideoOnDemandDomainDao
 import org.apache.ibatis.annotations.Mapper
 import org.apache.ibatis.annotations.Param
 import java.time.LocalDateTime
 
+// TODO : ポリモーフィックをやっている分、メソッド数が多くなってしまっているので、対象のクラスごとにMapperを分けるなどして対応する。
 @Mapper
 interface UpdateRequestDomainMapper {
     fun selectOneById(
@@ -27,6 +29,8 @@ interface UpdateRequestDomainMapper {
     fun selectOneUnfinishedModificationRequestByPhraseId(@Param("phraseId") phraseId: String): UpdateRequestDao?
 
     fun selectOneUnfinishedDeletionRequestByPhraseId(@Param("phraseId") phraseId: String): UpdateRequestDao?
+
+    fun selectOneUnfinishedSubcategoryModificationRequestBySubcategoryId(@Param("subcategoryId") subcategoryId: String): UpdateRequestDao?
 
     fun selectAllWhereUnfinishedAndExpired(
         @Param("now") now: LocalDateTime
@@ -95,5 +99,25 @@ interface UpdateRequestDomainMapper {
         @Param("currentSubcategoryName") currentSubcategoryName: String,
         @Param("currentSubcategoryIntroduction") currentPhraseContent: String?,
         @Param("currentSubcategoryImagePath") currentPhraseAuthorName: String?
+    )
+
+    //----- 以下、VideoOnDemand関係のメソッド -----//
+
+    fun selectAllVideoOnDemandsByUpdateRequestId(
+        @Param("updateRequestId") updateRequestId: String
+    ): List<VideoOnDemandDomainDao>
+
+    fun selectOneVideoOnDemandByNameKey(
+        @Param("nameKey") nameKey: String
+    ): VideoOnDemandDomainDao?
+
+    fun insertRequestVideoOnDemand(
+        @Param("id") id: String,
+        @Param("updateRequestId") updateRequestId: String,
+        @Param("videoOnDemandId") videoOnDemandId: String
+    )
+
+    fun deleteAllRequestVideoOnDemandBySubcategoryId(
+        @Param("updateRequestId") updateRequestId: String
     )
 }

@@ -11,4 +11,5 @@ interface UpdateRequestQueryDto {
     val finalDecisionResult: String?
     val approvedCount: Int
     val rejectedCount: Int
+    val commentCount: Int
 }

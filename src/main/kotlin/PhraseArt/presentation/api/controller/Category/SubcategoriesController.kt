@@ -24,4 +24,13 @@ class SubcategoriesController(@Autowired val subcategoryService : SubcategorySer
                 throw NotFoundException("subcategory is not found : ${subcategoryId}")
         return mutableMapOf("subcategory" to subcategory)
     }
+
+    // 候補一覧
+    @RequestMapping("/subcategories/candidates")
+    fun candidatesList(
+        @RequestParam(name="categoryId") categoryId: String?,
+        @RequestParam(name="word") word: String
+    ): MutableMap<String, List<SubcategoryQueryDto>> {
+        return mutableMapOf("subcategories" to subcategoryService.findAllCandidatesSubcategories(categoryId, word))
+    }
 }

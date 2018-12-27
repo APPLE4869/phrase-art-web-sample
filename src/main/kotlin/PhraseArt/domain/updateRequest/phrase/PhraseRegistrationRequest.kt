@@ -67,7 +67,7 @@ class PhraseRegistrationRequest: UpdateRequest, PhraseUpdateRequestIncludedSubca
                 anUserId,
                 UpdateRequestType.PHRASE_REGISTRATION,
                 false,
-                LocalDateTime.now().plusMinutes(120),
+                LocalDateTime.now().plusMinutes(180),
                 null,
                 mutableSetOf(),
                 aRequestedCategoryId,

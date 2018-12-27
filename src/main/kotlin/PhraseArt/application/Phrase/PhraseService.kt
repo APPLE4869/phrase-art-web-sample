@@ -24,6 +24,14 @@ class PhraseService(
         return phraseQuery.findAllPhrases(userIdOrNull(principalName), offset)
     }
 
+    fun findAllFavoritePhraseByUserId(principalName: String, offset: Int=0): List<PhraseQueryDto> {
+        return phraseQuery.findAllFavoritePhraseByUserId(UserId(principalName), offset)
+    }
+
+    fun findAllPhraseBySearchWord(principalName: String?, searchWord: String, offset: Int=0): List<PhraseQueryDto> {
+        return phraseQuery.findAllPhraseBySearchWord(userIdOrNull(principalName), searchWord, offset)
+    }
+
     fun findAllPhrasesByCategoryId(categoryId: String, principalName: String?, offset: Int=0): List<PhraseQueryDto> {
         return phraseQuery.findAllPhrasesByCategoryId(categoryId, userIdOrNull(principalName), offset)
     }

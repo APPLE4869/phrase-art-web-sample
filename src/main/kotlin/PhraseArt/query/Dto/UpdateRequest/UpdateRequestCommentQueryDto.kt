@@ -1,6 +1,6 @@
 package PhraseArt.query.Dto.UpdateRequest
 
-import java.sql.Timestamp
+import java.time.LocalDateTime
 
 data class UpdateRequestCommentQueryDto(
     val id: String,
@@ -8,5 +8,5 @@ data class UpdateRequestCommentQueryDto(
     val username: String,
     val userImageUrl: String?,
     val content: String,
-    val createdAt: Timestamp
+    val createdAt: LocalDateTime
 )

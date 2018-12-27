@@ -25,7 +25,6 @@ import org.springframework.security.core.userdetails.User
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import java.util.*
 import PhraseArt.presentation.api.form.LoginForm
-import jdk.nashorn.internal.runtime.regexp.joni.Config.log
 import javax.naming.AuthenticationException
 
 class JWTAuthenticationFilter : UsernamePasswordAuthenticationFilter {

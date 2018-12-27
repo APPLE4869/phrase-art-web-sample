@@ -23,6 +23,7 @@
     <mapper resource="mybatis/mappers/domain/phrase/PhraseCommentDomainMapper.xml"/>
 
     <!--query用のMapping-->
+    <mapper resource="mybatis/mappers/query/phrase/AuthorQueryMapper.xml"/>
     <mapper resource="mybatis/mappers/query/phrase/PhraseCommentQueryMapper.xml"/>
     <mapper resource="mybatis/mappers/query/phrase/PhraseQueryMapper.xml"/>
     <mapper resource="mybatis/mappers/query/updateRequest/UpdateRequestCommentQueryMapper.xml"/>
@@ -30,6 +31,8 @@
     <mapper resource="mybatis/mappers/query/updateRequest/UpdateRequestListQueryMapper.xml"/>
     <mapper resource="mybatis/mappers/query/category/CategoryQueryMapper.xml"/>
     <mapper resource="mybatis/mappers/query/category/SubcategoryQueryMapper.xml"/>
-    <mapper resource="mybatis/mappers/query/UserQueryMapper.xml"/>
+    <mapper resource="mybatis/mappers/query/category/VideoOnDemandQueryMapper.xml"/>
+    <mapper resource="mybatis/mappers/query/user/UserQueryMapper.xml"/>
+    <mapper resource="mybatis/mappers/query/user/ProfileQueryMapper.xml"/>
 </mappers>
 </configuration>

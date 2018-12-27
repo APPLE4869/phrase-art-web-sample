@@ -22,7 +22,10 @@ class MyBatisSubcategoryRepository(
     }
 
     override fun videoOnDemandsOfNameKeys(nameKeys: List<VideOnDemandNameKeyType>): List<VideoOnDemand> {
-        return subcategoryDomainMapper.selectAllVIdeoOnDemandsByNameKeys(nameKeys.map{ it.value }).map {
+        if (nameKeys.count() == 0)
+            return emptyList()
+
+        return subcategoryDomainMapper.selectAllVideoOnDemandsByNameKeys(nameKeys.map{ it.value }).map {
             daoToVideoOnDemand(it)
         }
     }
@@ -94,7 +97,7 @@ class MyBatisSubcategoryRepository(
         }
 
         videoOnDemands.forEach { videoOnDemand ->
-            val videoOnDemand = subcategoryDomainMapper.selectOneVideOnDemandByNameKey(videoOnDemand.nameKey.value) ?:
+            val videoOnDemand = subcategoryDomainMapper.selectOneVideoOnDemandByNameKey(videoOnDemand.nameKey.value) ?:
                 throw IllegalArgumentException("動画配信サービスの名前キーが不正です")
             subcategoryDomainMapper.insertSubcategoryVideoOnDemand(uuid(), subcategory.id.value, videoOnDemand.id)
         }

@@ -11,6 +11,7 @@ data class SubcategoryModificationRequestQueryDto(
     override val finalDecisionResult: String?,
     override val approvedCount: Int,
     override val rejectedCount: Int,
+    override val commentCount: Int,
     val categoryId: String,
     val categoryName: String,
     val subcategoryId: String,
